@@ -1,0 +1,26 @@
+# Dependencias
+node_modules/
+
+# Variables de entorno (NUNCA subir al repo)
+.env
+.env.local
+.env.production
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Sistema operativo (Windows)
+Thumbs.db
+Desktop.ini
+
+# Sistema operativo (Mac)
+.DS_Store
+
+# IDEs
+.vscode/
+.idea/
+
+# Docker
+*.env.docker

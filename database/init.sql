@@ -94,3 +94,48 @@ BEGIN
     SELECT LAST_INSERT_ID() as id_pedido;
 END //
 DELIMITER ;
+
+
+DELIMITER //
+CREATE PROCEDURE CalcularPrecioProducto(
+    IN p_tipo VARCHAR(10),
+    IN p_cantidad INT,
+    OUT p_precio DECIMAL(10,2)
+)
+BEGIN
+    IF p_cantidad >= 6 THEN
+        IF p_tipo = '1kg' THEN
+            SET p_precio = 40.00;
+        ELSE
+            SET p_precio = 25.00;
+        END IF;
+    ELSE
+        IF p_tipo = '1kg' THEN
+            SET p_precio = 45.00;
+        ELSE
+            SET p_precio = 30.00;
+        END IF;
+    END IF;
+END //
+DELIMITER ;
+
+CREATE TABLE IF NOT EXISTS FechasRecojo (
+    id_fecha INT PRIMARY KEY AUTO_INCREMENT,
+    fecha DATE NOT NULL UNIQUE,
+    disponible BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Insertar algunas fechas de ejemplo (próximos 30 días, de lunes a sábado)
+INSERT INTO FechasRecojo (fecha, disponible)
+SELECT DATE_ADD(CURDATE(), INTERVAL n DAY), TRUE
+FROM (
+    SELECT 1 n UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10
+) nums
+WHERE WEEKDAY(DATE_ADD(CURDATE(), INTERVAL n DAY)) BETWEEN 0 AND 5;  -- lunes a sábado
+
+ALTER TABLE Pedidos
+ADD COLUMN tipo_entrega ENUM('recojo', 'delivery') NOT NULL DEFAULT 'delivery',
+ADD COLUMN costo_envio DECIMAL(10,2) DEFAULT 0,
+ADD COLUMN fecha_entrega DATE,
+ADD COLUMN lugar_recojo VARCHAR(255) NULL;
