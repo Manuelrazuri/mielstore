@@ -1,0 +1,7 @@
+@import '../../index.scss';
+.cart-page { max-width: 800px; margin: 0 auto; padding: 1rem; }
+.cart-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; padding: 1rem; }
+.item-controls button { margin: 0 0.5rem; padding: 0.2rem 0.6rem; border: 1px solid #ccc; background: white; border-radius: 0.3rem; cursor: pointer; }
+.cart-summary { background: $light; padding: 1rem; border-radius: 0.5rem; margin-top: 1rem; text-align: right; }
+.total { font-size: 1.3rem; font-weight: bold; color: $primary-dark; }
+.empty-cart { text-align: center; padding: 3rem; font-size: 1.2rem; }

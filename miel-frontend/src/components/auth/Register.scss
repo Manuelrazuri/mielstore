@@ -1,0 +1,19 @@
+@import '../../index.scss';
+
+.register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 70vh;
+}
+.register-form {
+  background: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  input, button { width: 100%; margin-bottom: 1rem; padding: 0.6rem; }
+  button { background: $primary; color: white; border-radius: 2rem; font-weight: bold; }
+  .error { background: #ffe5e5; color: $danger; padding: 0.5rem; border-radius: 0.5rem; margin-bottom: 1rem; }
+}

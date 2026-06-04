@@ -1,0 +1,40 @@
+// src/index.scss
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #fef9e8;
+  color: #3e2a1f;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+// Variables
+$primary: #f5b042;
+$primary-dark: #d48d1a;
+$secondary: #7f5539;
+$light: #fff7ed;
+$danger: #e53e3e;
+$success: #2b6e3b;
+$gray: #ddd;
+$text-dark: #3e2a1f;

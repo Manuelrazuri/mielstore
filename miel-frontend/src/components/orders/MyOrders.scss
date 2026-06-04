@@ -1,0 +1,36 @@
+// MyOrders.module.scss
+@import '../../index.scss';
+
+.container {
+  padding: 1rem;
+  h2 { margin-bottom: 2rem; }
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  .header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+  }
+  .status {
+    padding: 0.2rem 0.8rem;
+    border-radius: 2rem;
+    font-size: 0.8rem;
+    &.pendiente { background: #fef3c7; color: #d97706; }
+    &.pagado { background: #d1fae5; color: #065f46; }
+    &.enviado { background: #dbeafe; color: #1e40af; }
+    &.entregado { background: #e0e7ff; color: #3730a3; }
+    &.cancelado { background: #fee2e2; color: #b91c1c; }
+  }
+}
