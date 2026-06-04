@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
-import Navbar from './components/common/Navbar';
+import Navbar from './components/common/Navbar/Navbar';
 import LandingPage from './components/landing/LandingPage';
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
@@ -10,7 +10,7 @@ import CartPage from './components/cart/CartPage';
 import Checkout from './components/cart/Checkout';
 import MyOrders from './components/orders/MyOrders';
 import Dashboard from './components/admin/Dashboard';
-import ProtectedRoute from './components/common/ProtectedRoute';
+import ProtectedRoute from './components/common/ProtectedRoute/ProtectedRoute';
 import './index.scss';
 
 function App() {

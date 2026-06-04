@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
-import './Register.scss';
+import './Register.module.scss';
 
 const Register = () => {
   const [form, setForm] = useState({ nombre: '', email: '', password: '', direccion: '', telefono: '' });

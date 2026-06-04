@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../services/api';
 import { useCart } from '../../hooks/useCart';
-import styles from './ProductList.scss';
+import styles from './ProductList.module.scss';
 import ProductCard from './ProductCard';
 
 const ProductList = () => {

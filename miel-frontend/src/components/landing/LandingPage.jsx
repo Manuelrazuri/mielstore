@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import styles from './LandingPage.scss';
+import styles from './LandingPage.module.scss';
 
 const LandingPage = () => {
   return (
@@ -20,7 +20,7 @@ const LandingPage = () => {
           <p>Entregas rápidas a todo Lima</p>
         </div>
         <div className={styles.feature}>
-          <h3>🏪 Recojo en tienda</h3>
+          <h3>🏪 Recojo en los alrededores</h3>
           <p>Plaza San Miguel</p>
         </div>
       </section>

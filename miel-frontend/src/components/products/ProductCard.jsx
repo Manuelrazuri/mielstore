@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styles from './ProductCard.scss';
+import styles from './ProductCard.module.scss';
 
 const ProductCard = ({ product, addToCart }) => {
   const [cantidad, setCantidad] = useState(1);

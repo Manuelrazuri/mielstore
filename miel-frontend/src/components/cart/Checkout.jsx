@@ -5,7 +5,7 @@ import 'react-calendar/dist/Calendar.css';
 import { useCart } from '../../hooks/useCart';
 import { AuthContext } from '../../context/AuthContext';
 import api from '../../services/api';
-import styles from './Checkout.scss';
+import styles from './Checkout.module.scss';
 
 const Checkout = () => {
   const { cart, getSubtotal, getShippingCost, getTotal, clearCart } = useCart();
