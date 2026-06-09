@@ -1,0 +1,38 @@
+@import '../../index.scss';
+.container { padding: 1rem; }
+.form {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 2rem;
+  input, button {
+    padding: 0.5rem;
+    border-radius: 0.3rem;
+  }
+  button {
+    background: $primary;
+    color: white;
+    border: none;
+    cursor: pointer;
+    &:hover { background: $primary-dark; }
+  }
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  th, td {
+    border: 1px solid $gray;
+    padding: 0.5rem;
+    text-align: left;
+  }
+  th { background: $primary; color: white; }
+  button {
+    margin-right: 0.5rem;
+    padding: 0.2rem 0.6rem;
+    background: #f0f0f0;
+    border: none;
+    border-radius: 0.3rem;
+    cursor: pointer;
+    &:hover { background: #ddd; }
+  }
+}

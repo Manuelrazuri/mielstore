@@ -1,0 +1,18 @@
+@import '../../index.scss';
+.container { padding: 1rem; }
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  th, td {
+    border: 1px solid $gray;
+    padding: 0.5rem;
+    text-align: left;
+  }
+  th { background: $primary; color: white; }
+  .pendiente { background: #fef3c7; }
+  .pagado { background: #d1fae5; }
+  .enviado { background: #dbeafe; }
+  .entregado { background: #e0e7ff; }
+  .cancelado { background: #fee2e2; }
+  select { padding: 0.2rem; border-radius: 0.3rem; }
+}
