@@ -57,6 +57,7 @@ INSERT INTO Usuarios (nombre, email, password, rol) VALUES
 ('Admin', 'admin@miel.com', '$2a$10$r0Yi0vJ/0t6qRxjU3lY0FOiJ5u5nLxQvKjZxHc8K.hkY7sFqJXtqW', 'admin');
 
 -- SP Calcular precio por mayor
+DROP PROCEDURE IF EXISTS CalcularPrecioProducto;
 DELIMITER //
 CREATE PROCEDURE CalcularPrecioProducto(
     IN p_tipo VARCHAR(10),
@@ -64,17 +65,17 @@ CREATE PROCEDURE CalcularPrecioProducto(
     OUT p_precio DECIMAL(10,2)
 )
 BEGIN
-    IF p_cantidad >= 5 THEN
+    IF p_cantidad >= 6 THEN
         IF p_tipo = '1kg' THEN
-            SET p_precio = 40.00;
+            SET p_precio = 35.00;
         ELSE
-            SET p_precio = 20.00;
+            SET p_precio = 25.00;
         END IF;
     ELSE
         IF p_tipo = '1kg' THEN
-            SET p_precio = 45.00;
+            SET p_precio = 40.00;
         ELSE
-            SET p_precio = 30.00;
+            SET p_precio = 28.00;
         END IF;
     END IF;
 END //
@@ -92,30 +93,6 @@ BEGIN
     VALUES (p_id_usuario, p_direccion, 'pendiente', 0);
     
     SELECT LAST_INSERT_ID() as id_pedido;
-END //
-DELIMITER ;
-
-
-DELIMITER //
-CREATE PROCEDURE CalcularPrecioProducto(
-    IN p_tipo VARCHAR(10),
-    IN p_cantidad INT,
-    OUT p_precio DECIMAL(10,2)
-)
-BEGIN
-    IF p_cantidad >= 6 THEN
-        IF p_tipo = '1kg' THEN
-            SET p_precio = 40.00;
-        ELSE
-            SET p_precio = 25.00;
-        END IF;
-    ELSE
-        IF p_tipo = '1kg' THEN
-            SET p_precio = 45.00;
-        ELSE
-            SET p_precio = 30.00;
-        END IF;
-    END IF;
 END //
 DELIMITER ;
 
@@ -152,72 +129,6 @@ ALTER TABLE FechasRecojo ADD COLUMN activo BOOLEAN DEFAULT TRUE;
 -- Índice para mejorar búsquedas
 CREATE INDEX idx_productos_activo ON Productos(activo);
 CREATE INDEX idx_fechas_activo ON FechasRecojo(activo);
-
-
-
--- Obtener productos activos (no eliminados)
-DROP PROCEDURE IF EXISTS SP_Admin_GetAllProducts;
-DELIMITER //
-CREATE PROCEDURE SP_Admin_GetAllProducts()
-BEGIN
-    SELECT * FROM Productos WHERE activo = 1 ORDER BY id_producto;
-END //
-DELIMITER ;
-
--- Crear producto (activo por defecto)
-DROP PROCEDURE IF EXISTS SP_Admin_CreateProduct;
-DELIMITER //
-CREATE PROCEDURE SP_Admin_CreateProduct(
-    IN p_nombre VARCHAR(100),
-    IN p_tipo VARCHAR(20),
-    IN p_precio_normal DECIMAL(10,2),
-    IN p_precio_mayor DECIMAL(10,2),
-    IN p_stock INT
-)
-BEGIN
-    INSERT INTO Productos (nombre, tipo, precio_normal, precio_mayor, stock, activo)
-    VALUES (p_nombre, p_tipo, p_precio_normal, p_precio_mayor, p_stock, 1);
-    
-    SELECT LAST_INSERT_ID() AS new_id;
-END //
-DELIMITER ;
-
--- Actualizar producto (solo si está activo)
-DROP PROCEDURE IF EXISTS SP_Admin_UpdateProduct;
-DELIMITER //
-CREATE PROCEDURE SP_Admin_UpdateProduct(
-    IN p_id INT,
-    IN p_nombre VARCHAR(100),
-    IN p_tipo VARCHAR(20),
-    IN p_precio_normal DECIMAL(10,2),
-    IN p_precio_mayor DECIMAL(10,2),
-    IN p_stock INT
-)
-BEGIN
-    UPDATE Productos 
-    SET nombre = p_nombre,
-        tipo = p_tipo,
-        precio_normal = p_precio_normal,
-        precio_mayor = p_precio_mayor,
-        stock = p_stock
-    WHERE id_producto = p_id AND activo = 1;
-    
-    SELECT ROW_COUNT() AS affected_rows, 'Producto actualizado' AS message;
-END //
-DELIMITER ;
-
--- Eliminado lógico de producto
-DROP PROCEDURE IF EXISTS SP_Admin_DeleteProduct;
-DELIMITER //
-CREATE PROCEDURE SP_Admin_DeleteProduct(
-    IN p_id INT
-)
-BEGIN
-    UPDATE Productos SET activo = 0 WHERE id_producto = p_id;
-    SELECT 'Producto eliminado lógicamente' AS message;
-END //
-DELIMITER ;
-
 
 -- Obtener fechas activas (no eliminadas lógicamente)
 DROP PROCEDURE IF EXISTS SP_Admin_GetAllDates;
@@ -330,19 +241,19 @@ BEGIN
     FROM Pedidos
     GROUP BY estado;
 
-    -- 3. Ventas por producto (unidades vendidas e ingreso)
+    -- 3. Ventas por producto (usando variedad + presentacion)
     SELECT 
         p.id_producto,
-        p.nombre AS producto,
+        CONCAT(p.variedad, ' (', p.presentacion, ')') AS producto,
         COALESCE(SUM(d.cantidad), 0) AS unidades_vendidas,
         COALESCE(SUM(d.subtotal), 0) AS ingreso
     FROM Productos p
     LEFT JOIN DetallePedido d ON p.id_producto = d.id_producto
+    WHERE p.activo = 1
     GROUP BY p.id_producto
     ORDER BY unidades_vendidas DESC;
 
     -- 4. Ventas por distrito (extrae distrito de la dirección de entrega)
-    -- Nota: Asume que la dirección contiene el distrito al final, separado por coma
     SELECT 
         CASE 
             WHEN direccion_entrega LIKE '%San Miguel%' THEN 'San Miguel'
@@ -367,10 +278,10 @@ BEGIN
     FROM Pedidos
     GROUP BY tipo_entrega;
 
-    -- 6. Top 5 productos más vendidos
+    -- 6. Top 5 productos más vendidos (usando variedad + presentacion)
     SELECT 
         p.id_producto,
-        p.nombre,
+        CONCAT(p.variedad, ' (', p.presentacion, ')') AS nombre,
         SUM(d.cantidad) AS total_unidades
     FROM DetallePedido d
     JOIN Productos p ON d.id_producto = p.id_producto
@@ -379,3 +290,79 @@ BEGIN
     LIMIT 5;
 END //
 DELIMITER ;
+
+ALTER TABLE Usuarios ADD COLUMN activo BOOLEAN DEFAULT TRUE;
+ALTER TABLE FechasRecojo ADD COLUMN activo BOOLEAN DEFAULT TRUE;
+
+--Obtener productos creados---
+
+DROP PROCEDURE IF EXISTS SP_Admin_GetAllProducts;
+DELIMITER //
+CREATE PROCEDURE SP_Admin_GetAllProducts()
+BEGIN
+    SELECT id_producto, variedad, presentacion, precio_normal, precio_mayor, stock, activo, created_at
+    FROM Productos
+    WHERE activo = 1
+    ORDER BY id_producto;
+END //
+DELIMITER ;
+
+
+--Crear Productos---
+
+DROP PROCEDURE IF EXISTS SP_Admin_CreateProduct;
+DELIMITER //
+CREATE PROCEDURE SP_Admin_CreateProduct(
+    IN p_variedad VARCHAR(100),
+    IN p_presentacion VARCHAR(20),
+    IN p_precio_normal DECIMAL(10,2),
+    IN p_precio_mayor DECIMAL(10,2),
+    IN p_stock INT
+)
+BEGIN
+    INSERT INTO Productos (variedad, presentacion, precio_normal, precio_mayor, stock, activo)
+    VALUES (p_variedad, p_presentacion, p_precio_normal, p_precio_mayor, p_stock, 1);
+    SELECT LAST_INSERT_ID() AS new_id;
+END //
+DELIMITER ;
+
+---Actualizar Productos--
+
+DROP PROCEDURE IF EXISTS SP_Admin_UpdateProduct;
+DELIMITER //
+CREATE PROCEDURE SP_Admin_UpdateProduct(
+    IN p_id INT,
+    IN p_variedad VARCHAR(100),
+    IN p_presentacion VARCHAR(20),
+    IN p_precio_normal DECIMAL(10,2),
+    IN p_precio_mayor DECIMAL(10,2),
+    IN p_stock INT
+)
+BEGIN
+    UPDATE Productos 
+    SET variedad = p_variedad,
+        presentacion = p_presentacion,
+        precio_normal = p_precio_normal,
+        precio_mayor = p_precio_mayor,
+        stock = p_stock
+    WHERE id_producto = p_id AND activo = 1;
+    SELECT ROW_COUNT() AS affected_rows, 'Producto actualizado' AS message;
+END //
+DELIMITER ;
+
+--Eliminado Logico del producto---
+DROP PROCEDURE IF EXISTS SP_Admin_DeleteProduct;
+DELIMITER //
+CREATE PROCEDURE SP_Admin_DeleteProduct(IN p_id INT)
+BEGIN
+    UPDATE Productos SET activo = 0 WHERE id_producto = p_id;
+    SELECT 'Producto eliminado lógicamente' AS message;
+END //
+DELIMITER ;
+
+
+ALTER TABLE Productos CHANGE COLUMN nombre variedad VARCHAR(100) NOT NULL;
+ALTER TABLE Productos CHANGE COLUMN tipo presentacion VARCHAR(20) NOT NULL;
+ALTER TABLE Productos ADD COLUMN imagen_url VARCHAR(255) NULL;
+
+

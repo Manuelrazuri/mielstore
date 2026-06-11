@@ -46,20 +46,20 @@ const getAllProducts = async () => {
 };
 
 const createProduct = async (productData) => {
-    const { nombre, tipo, precio_normal, precio_mayor, stock } = productData;
+    const { variedad, presentacion, precio_normal, precio_mayor, stock } = productData;
     const [result] = await pool.query(
         'CALL SP_Admin_CreateProduct(?, ?, ?, ?, ?)',
-        [nombre, tipo, precio_normal, precio_mayor, stock]
+        [variedad, presentacion, precio_normal, precio_mayor, stock]
     );
     const newId = result[0][0]?.new_id;
     return { id: newId, message: 'Producto creado' };
 };
 
 const updateProduct = async (id, productData) => {
-    const { nombre, tipo, precio_normal, precio_mayor, stock } = productData;
+    const { variedad, presentacion, precio_normal, precio_mayor, stock } = productData;
     const [result] = await pool.query(
         'CALL SP_Admin_UpdateProduct(?, ?, ?, ?, ?, ?)',
-        [id, nombre, tipo, precio_normal, precio_mayor, stock]
+        [id, variedad, presentacion, precio_normal, precio_mayor, stock]
     );
     const affected = result[0][0]?.affected_rows;
     if (affected === 0) throw new Error('Producto no encontrado o ya eliminado');

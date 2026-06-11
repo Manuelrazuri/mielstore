@@ -5,8 +5,8 @@ import styles from './ProductsAdmin.module.scss';
 const ProductsAdmin = () => {
   const [products, setProducts] = useState([]);
   const [form, setForm] = useState({
-    nombre: '',
-    tipo: '1kg',
+    variedad: '',
+    presentacion: '1kg',
     precio_normal: '',
     precio_mayor: '',
     stock: ''
@@ -17,9 +17,10 @@ const ProductsAdmin = () => {
   const fetchProducts = async () => {
     try {
       const res = await api.get('/admin/productos');
+      console.log('Productos recibidos:', res.data);
       setProducts(res.data);
     } catch (err) {
-      console.error(err);
+      console.error('Error fetching products:', err);
     }
   };
 
@@ -36,9 +37,9 @@ const ProductsAdmin = () => {
       } else {
         await api.post('/admin/productos', form);
       }
-      setForm({ nombre: '', tipo: '1kg', precio_normal: '', precio_mayor: '', stock: '' });
+      setForm({ variedad: '', presentacion: '1kg', precio_normal: '', precio_mayor: '', stock: '' });
       setEditingId(null);
-      fetchProducts();
+      await fetchProducts();
     } catch (err) {
       alert(err.response?.data?.message || 'Error al guardar producto');
     } finally {
@@ -50,7 +51,7 @@ const ProductsAdmin = () => {
     if (!window.confirm('¿Eliminar lógicamente este producto?')) return;
     try {
       await api.delete(`/admin/productos/${id}`);
-      fetchProducts();
+      await fetchProducts();
     } catch (err) {
       alert(err.response?.data?.message || 'Error al eliminar');
     }
@@ -59,8 +60,8 @@ const ProductsAdmin = () => {
   const handleEdit = (product) => {
     setEditingId(product.id_producto);
     setForm({
-      nombre: product.nombre,
-      tipo: product.tipo,
+      variedad: product.variedad,
+      presentacion: product.presentacion,
       precio_normal: product.precio_normal,
       precio_mayor: product.precio_mayor,
       stock: product.stock
@@ -73,19 +74,19 @@ const ProductsAdmin = () => {
       <form onSubmit={handleSubmit} className={styles.form}>
         <input
           type="text"
-          placeholder="Nombre"
-          value={form.nombre}
-          onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+          placeholder="Variedad (ej: Ceibo, Mango, Tierra)"
+          value={form.variedad}
+          onChange={(e) => setForm({ ...form, variedad: e.target.value })}
           required
         />
-        <select value={form.tipo} onChange={(e) => setForm({ ...form, tipo: e.target.value })}>
-          <option value="1kg">1kg</option>
-          <option value="1/2kg">1/2kg</option>
+        <select value={form.presentacion} onChange={(e) => setForm({ ...form, presentacion: e.target.value })}>
+          <option value="1kg">1 kg</option>
+          <option value="1/2kg">1/2 kg</option>
         </select>
         <input
           type="number"
           step="0.01"
-          placeholder="Precio normal"
+          placeholder="Precio normal (S/)"
           value={form.precio_normal}
           onChange={(e) => setForm({ ...form, precio_normal: e.target.value })}
           required
@@ -93,7 +94,7 @@ const ProductsAdmin = () => {
         <input
           type="number"
           step="0.01"
-          placeholder="Precio mayor"
+          placeholder="Precio mayor (6+ unidades) S/"
           value={form.precio_mayor}
           onChange={(e) => setForm({ ...form, precio_mayor: e.target.value })}
           required
@@ -112,7 +113,7 @@ const ProductsAdmin = () => {
           {editingId && (
             <button type="button" onClick={() => {
               setEditingId(null);
-              setForm({ nombre: '', tipo: '1kg', precio_normal: '', precio_mayor: '', stock: '' });
+              setForm({ variedad: '', presentacion: '1kg', precio_normal: '', precio_mayor: '', stock: '' });
             }}>
               Cancelar
             </button>
@@ -123,15 +124,15 @@ const ProductsAdmin = () => {
       <table className={styles.table}>
         <thead>
           <tr>
-            <th>ID</th><th>Nombre</th><th>Tipo</th><th>Precio normal</th><th>Precio mayor</th><th>Stock</th><th>Acciones</th>
+            <th>ID</th><th>Variedad</th><th>Presentación</th><th>Precio normal</th><th>Precio mayor</th><th>Stock</th><th>Acciones</th>
           </tr>
         </thead>
         <tbody>
           {products.map(p => (
             <tr key={p.id_producto}>
               <td>{p.id_producto}</td>
-              <td>{p.nombre}</td>
-              <td>{p.tipo}</td>
+              <td>{p.variedad}</td>
+              <td>{p.presentacion}</td>
               <td>S/ {p.precio_normal}</td>
               <td>S/ {p.precio_mayor}</td>
               <td>{p.stock}</td>

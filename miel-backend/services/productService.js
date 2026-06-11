@@ -1,25 +1,24 @@
 const pool = require('../db/pool');
 
-// Regla de negocio central: >= 5 unidades = precio mayorista
-const UMBRAL_MAYORISTA = 5;
+const UMBRAL_MAYORISTA = 6;
 
 const getAll = async () => {
     const [products] = await pool.query(
-        'SELECT * FROM Productos WHERE stock > 0'
+        'SELECT * FROM Productos WHERE activo = 1 AND stock > 0'
     );
     return products;
 };
 
 const calcularPrecio = async ({ tipo, cantidad }) => {
-    const [result] = await pool.query(
-        'CALL CalcularPrecioProducto(?, ?, @precio)',
-        [tipo, cantidad]
-    );
-    const [precio] = await pool.query('SELECT @precio as precio');
-    return precio[0].precio;
+    let precio;
+    if (cantidad >= UMBRAL_MAYORISTA) {
+        precio = tipo === '1kg' ? 35.00 : 25.00;
+    } else {
+        precio = tipo === '1kg' ? 40.00 : 28.00;
+    }
+    return precio;
 };
 
-// Determina el precio correcto para un producto según la cantidad total del carrito
 const resolverPrecioUnitario = (product, cantidadTotal) => {
     const esMayorista = cantidadTotal >= UMBRAL_MAYORISTA;
     return esMayorista ? product.precio_mayor : product.precio_normal;
