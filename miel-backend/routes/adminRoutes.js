@@ -28,5 +28,6 @@ router.post('/productos', adminController.createProduct);
 router.put('/productos/:id', adminController.updateProduct);
 router.delete('/productos/:id', adminController.deleteProduct);
 router.get('/stats', adminController.getStats);
+router.put('/pedidos/:id/pagar', adminController.updatePaymentStatus);
 
 module.exports = router;

@@ -85,6 +85,11 @@ const getStats = async () => {
     return stats;
 };
 
+const updatePaymentStatus = async (orderId, status) => {
+    const [result] = await pool.query('CALL SP_Admin_UpdatePaymentStatus(?, ?)', [orderId, status]);
+    return { message: result[0][0]?.message || 'Estado de pago actualizado' };
+};
+
 module.exports = {
     getAllUsers,
     updateUserRole,
@@ -97,5 +102,6 @@ module.exports = {
     createProduct,
     updateProduct,
     deleteProduct,
-    getStats
+    getStats,
+    updatePaymentStatus
 };

@@ -1,3 +1,5 @@
+// ProductList.jsx
+
 import React, { useEffect, useState } from 'react';
 import api from '../../services/api';
 import { useCart } from '../../hooks/useCart';

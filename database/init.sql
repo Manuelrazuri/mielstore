@@ -366,3 +366,54 @@ ALTER TABLE Productos CHANGE COLUMN tipo presentacion VARCHAR(20) NOT NULL;
 ALTER TABLE Productos ADD COLUMN imagen_url VARCHAR(255) NULL;
 
 
+-- Agregar columnas de pago
+ALTER TABLE Pedidos 
+ADD COLUMN metodo_pago ENUM('yape', 'plin', 'contraentrega') NOT NULL DEFAULT 'contraentrega',
+ADD COLUMN evidencia_pago VARCHAR(255) NULL,
+ADD COLUMN estado_pago ENUM('pendiente', 'pagado', 'rechazado') DEFAULT 'pendiente',
+ADD COLUMN numero_operacion VARCHAR(50) NULL;
+
+-- SP para cliente: obtener pedidos con info de pago
+DROP PROCEDURE IF EXISTS SP_GetMisPedidos;
+DELIMITER //
+CREATE PROCEDURE SP_GetMisPedidos(IN p_user_id INT)
+BEGIN
+    SELECT 
+        p.id_pedido,
+        p.fecha_pedido,
+        p.total,
+        p.estado,
+        p.direccion_entrega,
+        p.tipo_entrega,
+        p.costo_envio,
+        p.fecha_entrega,
+        p.lugar_recojo,
+        p.metodo_pago,
+        p.estado_pago,
+        p.evidencia_pago,
+        p.numero_operacion,
+        GROUP_CONCAT(CONCAT(d.cantidad, 'x ', pr.variedad, ' (', pr.presentacion, ')') SEPARATOR ', ') AS productos
+    FROM Pedidos p
+    JOIN DetallePedido d ON p.id_pedido = d.id_pedido
+    JOIN Productos pr ON d.id_producto = pr.id_producto
+    WHERE p.id_usuario = p_user_id
+    GROUP BY p.id_pedido
+    ORDER BY p.fecha_pedido DESC;
+END //
+DELIMITER ;
+
+-- SP para admin: actualizar estado de pago
+DROP PROCEDURE IF EXISTS SP_Admin_UpdatePaymentStatus;
+DELIMITER //
+CREATE PROCEDURE SP_Admin_UpdatePaymentStatus(
+    IN p_order_id INT,
+    IN p_new_status VARCHAR(20)
+)
+BEGIN
+    IF p_new_status NOT IN ('pendiente', 'pagado', 'rechazado') THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Estado de pago inválido';
+    END IF;
+    UPDATE Pedidos SET estado_pago = p_new_status WHERE id_pedido = p_order_id;
+    SELECT 'Estado de pago actualizado' AS message;
+END //
+DELIMITER ;

@@ -94,6 +94,15 @@ const getStats = async (req, res, next) => {
         next(error);
     }
 };
+
+const updatePaymentStatus = async (req, res, next) => {
+    const { id } = req.params;
+    const { estado_pago } = req.body;
+    try {
+        const result = await adminService.updatePaymentStatus(id, estado_pago);
+        res.json(result);
+    } catch (error) { next(error); }
+};
 module.exports = {
     getUsers,
     updateRole,
@@ -106,5 +115,6 @@ module.exports = {
     createProduct,
     updateProduct,
     deleteProduct,
-    getStats
+    getStats,
+    updatePaymentStatus
 };

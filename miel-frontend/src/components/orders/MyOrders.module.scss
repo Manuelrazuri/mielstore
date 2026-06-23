@@ -34,3 +34,16 @@
     &.cancelado { background: #fee2e2; color: #b91c1c; }
   }
 }
+.cancelBtn {
+  margin-top: 0.8rem;
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  padding: 0.4rem 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  &:hover {
+    background-color: #b91c1c;
+  }
+}

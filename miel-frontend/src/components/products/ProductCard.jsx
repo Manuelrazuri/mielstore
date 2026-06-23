@@ -1,3 +1,5 @@
+// ProductCard.jsx
+
 import React, { useState } from 'react';
 import styles from './ProductCard.module.scss';
 
