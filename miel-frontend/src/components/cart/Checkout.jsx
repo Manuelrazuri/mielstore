@@ -20,6 +20,8 @@ const Checkout = () => {
   const [metodoPago, setMetodoPago] = useState('');
   const [numeroOperacion, setNumeroOperacion] = useState('');
   const [evidencia, setEvidencia] = useState(null);
+  const [previewEvidencia, setPreviewEvidencia] = useState('');
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     if (tipoEntrega === 'recojo') {
@@ -34,6 +36,19 @@ const Checkout = () => {
     const dateStr = date.toISOString().split('T')[0];
     return !fechasDisponibles.includes(dateStr);
   };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setEvidencia(file);
+      const reader = new FileReader();
+      reader.onload = (event) => setPreviewEvidencia(event.target.result);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const openModal = () => setModalOpen(true);
+  const closeModal = () => setModalOpen(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -94,29 +109,59 @@ const Checkout = () => {
               <label>Dirección de entrega</label>
               <textarea value={direccion} onChange={e => setDireccion(e.target.value)} required rows={3} />
             </div>
+
             <div className={styles.field}>
               <label>Método de pago</label>
               <div className={styles.paymentOptions}>
-                <label>
+                <label className={metodoPago === 'yape' ? styles.active : ''}>
                   <input
                     type="radio"
                     name="metodoPago"
                     value="yape"
                     checked={metodoPago === 'yape'}
                     onChange={() => setMetodoPago('yape')}
-                  /> Yape
+                  />
+                  Yape
                 </label>
-                <label>
+                <label className={metodoPago === 'plin' ? styles.active : ''}>
                   <input
                     type="radio"
                     name="metodoPago"
                     value="plin"
                     checked={metodoPago === 'plin'}
                     onChange={() => setMetodoPago('plin')}
-                  /> Plin
+                  />
+                  Plin
                 </label>
               </div>
+
+              {/* QR con modal */}
+              {metodoPago && (
+                <div className={styles.qrContainer}>
+                  <p className={styles.qrLabel}>
+                    Escanea el código QR para pagar con {metodoPago.toUpperCase()}:
+                  </p>
+                  <div className={styles.qrWrapper}>
+                    <img
+                      src={`/imagenes/QR-${metodoPago.charAt(0).toUpperCase() + metodoPago.slice(1)}.jpeg`}
+                      alt={`QR ${metodoPago}`}
+                      className={styles.qrImage}
+                      onClick={openModal}
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        const fallback = e.target.nextSibling;
+                        if (fallback) fallback.style.display = 'block';
+                      }}
+                    />
+                    <p className={styles.qrHint}>(Haz clic para ampliar)</p>
+                    <p className={styles.qrFallback} style={{ display: 'none' }}>
+                      No se pudo cargar el QR. Por favor, contacta al vendedor.
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
+
             <div className={styles.field}>
               <label>Número de operación</label>
               <input
@@ -127,14 +172,22 @@ const Checkout = () => {
                 required
               />
             </div>
+
             <div className={styles.field}>
               <label>Captura del comprobante (imagen)</label>
               <input
                 type="file"
                 accept="image/*"
-                onChange={e => setEvidencia(e.target.files[0])}
+                onChange={handleFileChange}
                 required
+                className={styles.fileInput}
               />
+              {previewEvidencia && (
+                <div className={styles.previewContainer}>
+                  <p className={styles.previewLabel}>Vista previa:</p>
+                  <img src={previewEvidencia} alt="Comprobante" className={styles.previewImage} />
+                </div>
+              )}
             </div>
           </>
         )}
@@ -163,6 +216,34 @@ const Checkout = () => {
           {loading ? 'Procesando...' : 'Confirmar pedido'}
         </button>
       </form>
+
+      {/* MODAL */}
+      {modalOpen && (
+        <div className={styles.modalOverlay} onClick={closeModal}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <button className={styles.modalClose} onClick={closeModal}>✕</button>
+            <h3 className={styles.modalTitle}>
+              Código QR - {metodoPago.toUpperCase()}
+            </h3>
+            <img
+              src={`/imagenes/QR-${metodoPago.charAt(0).toUpperCase() + metodoPago.slice(1)}.jpeg`}
+              alt={`QR ${metodoPago}`}
+              className={styles.modalImage}
+              onError={(e) => {
+                e.target.style.display = 'none';
+                const fallback = e.target.nextSibling;
+                if (fallback) fallback.style.display = 'block';
+              }}
+            />
+            <p className={styles.modalFallback} style={{ display: 'none' }}>
+              No se pudo cargar el QR. Contacta al vendedor.
+            </p>
+            <p className={styles.modalHint}>
+              Escanea este código con tu aplicación de {metodoPago.toUpperCase()}
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
